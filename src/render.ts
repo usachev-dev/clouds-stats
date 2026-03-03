@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
-const cwdTemplatePath = join(process.cwd(), "index.html");
+const cwdTemplatePath = join(process.cwd(), "templates", "index.html");
 const fallbackTemplatePath = join(import.meta.dir, "..", "index.html");
 const templatePath = existsSync(cwdTemplatePath) ? cwdTemplatePath : fallbackTemplatePath;
 const htmlTemplate = await Bun.file(templatePath).text();
