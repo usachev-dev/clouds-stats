@@ -1,0 +1,20 @@
+@use "sass:meta";
+@include meta.load-css("css-normalize/assets/css/reset.css");
+@include meta.load-css("skeleton.css/skeleton.css");
+
+$bg-color: #f5f7fb;
+$text-color: #1f2937;
+
+body {
+  margin: 0;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
+  background: $bg-color;
+  color: $text-color;
+}
+
+h1 {
+  margin-top: 0;
+}
+
+

@@ -1,0 +1,24 @@
+{
+  "name": "clouds-stats",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:server": "bun --watch index.ts",
+    "dev:styles": "bun run build:styles:watch",
+    "build": "bun run build:assets && bun run build:exe",
+    "build:assets": "bun run ./scripts/copy-public.ts && bun run build:styles",
+    "build:styles": "bun run ./scripts/build-styles.ts",
+    "build:styles:watch": "bun run ./scripts/build-styles.ts dev",
+    "build:exe": "bun build --compile ./index.ts --outfile ./dist/clouds-stats.exe",
+    "start": "bun index.ts"
+  },
+  "devDependencies": {
+    "bun-types": "1.3.10",
+    "sass": "1.97.3"
+  },
+  "dependencies": {
+    "css-normalize": "0.0.1",
+    "skeleton.css": "^2.0.4"
+  }
+}
