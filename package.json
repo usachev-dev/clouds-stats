@@ -6,8 +6,9 @@
   "scripts": {
     "dev:server": "bun --watch index.ts",
     "dev:styles": "bun run build:styles:watch",
-    "build": "bun run build:assets && bun run build:exe",
-    "build:assets": "bun run ./scripts/copy-public.ts && bun run build:styles",
+    "clean:dist": "bun run ./scripts/clean-dist.ts",
+    "build": "bun run ./scripts/clean-dist.ts && bun run build:assets && bun run build:exe",
+    "build:assets": "bun run build:styles && bun run ./scripts/copy-public.ts",
     "build:styles": "bun run ./scripts/build-styles.ts",
     "build:styles:watch": "bun run ./scripts/build-styles.ts dev",
     "build:exe": "bun build --compile ./index.ts --outfile ./dist/clouds-stats.exe",

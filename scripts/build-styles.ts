@@ -1,65 +1,57 @@
-import { createHash } from "node:crypto";
-import { watch } from "node:fs";
-import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import * as sass from "sass";
 
-const rootDir = join(import.meta.dir, "..");
 const args = process.argv.slice(2);
 const isDevMode = args.includes("dev");
-const outputDirName = join("dist", "public");
-const outputDirNameDev = "public";
+const rootUrl = new URL("../", import.meta.url);
+const sourceFileUrl = new URL("styles/index.scss", rootUrl);
+const outputDirUrl = new URL(isDevMode ? "public/" : "dist/public/", rootUrl);
+const outputDirPath = Bun.fileURLToPath(outputDirUrl);
+const outputDirName = isDevMode ? "public" : "dist/public";
+const outputFileNameDev = "index.css";
 
-const sourceFile = join(import.meta.dir, "..", "styles", "index.scss");
-const outputDir = join(rootDir, isDevMode ? outputDirNameDev : outputDirName);
+
+async function removeFiles(dirPath: string): Promise<void> {
+  const files = Array.from(new Bun.Glob("*").scanSync(dirPath));
+  for (const name of files) {
+    if (name === outputFileNameDev || /^index\.[a-f0-9]{10}\.css$/i.test(name)) {
+      await Bun.$`rm -f ${`${dirPath}/${name}`}`.quiet();
+    }
+  }
+}
 
 async function buildStyles(): Promise<void> {
-  const result = sass.compile(sourceFile, {
-    loadPaths: [join(import.meta.dir, "..", "node_modules")],
+  const result = sass.compile(Bun.fileURLToPath(sourceFileUrl), {
+    loadPaths: [Bun.fileURLToPath(new URL("node_modules/", rootUrl))],
     style: "compressed",
   });
 
-  const hash = createHash("sha256").update(result.css).digest("hex").slice(0, 10);
-  const outputFileName =`index.${hash}.css`;
-  const outputFileNameDev = 'index.css';
-  const outputFile = join(outputDir, isDevMode ? outputFileNameDev : outputFileName);
-  const outputFileDev = join(outputDirNameDev, outputFileNameDev);
-  try {
-    rm(outputFileDev, {force: true})
-  } catch {}
+  const hash = Bun.hash(result.css).toString(16).padStart(16, "0").slice(0, 10);
+  const outputFileName = `index.${hash}.css`;
+  const outputFile = new URL(isDevMode ? outputFileNameDev : outputFileName, outputDirUrl);
+  
+  await Bun.$`mkdir -p ${outputDirPath}`.quiet();
+  await removeFiles("public");
+  await removeFiles(outputDirPath);
+  await Bun.write(outputFile, result.css);
 
-  await mkdir(outputDir, { recursive: true });
-
-  const publicFiles = await readdir(outputDir);
-  await Promise.all(
-    publicFiles
-      .filter((name) => name === outputFileName || /^index\.[a-f0-9]{10}\.css$/i.test(name))
-      .map((name) => rm(join(outputDir, name))),
-  );
-
-  await writeFile(outputFile, result.css, "utf8");
-  console.log(`Built ${outputFileName} -> ${outputDir}`);
+  console.log(`Built ${isDevMode ? outputFileNameDev : outputFileName} -> ${outputDirName}`);
 }
 
 await buildStyles();
 
 if (isDevMode) {
-  console.log(`Watching ${sourceFile}`);
-  let timer: ReturnType<typeof setTimeout> | null = null;
-
-  watch(sourceFile, () => {
-    if (timer) {
-      clearTimeout(timer);
-    }
-
-    timer = setTimeout(async () => {
+  console.log(`Watching ${Bun.fileURLToPath(sourceFileUrl)}`);
+  let lastHash = Bun.hash(await Bun.file(sourceFileUrl).text());
+  while (true) {
+    await Bun.sleep(300);
+    const nextHash = Bun.hash(await Bun.file(sourceFileUrl).text());
+    if (nextHash !== lastHash) {
+      lastHash = nextHash;
       try {
         await buildStyles();
       } catch (error) {
         console.error("CSS build failed:", error);
       }
-    }, 500);
-  });
-
-  await new Promise(() => {});
+    }
+  }
 }

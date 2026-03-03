@@ -1,17 +1,22 @@
-import { cp, copyFile, mkdir, rm } from "node:fs/promises";
-import { join } from "node:path";
+const rootDir = Bun.fileURLToPath(new URL("../", import.meta.url));
+const sourceDir = `${rootDir}/public`;
+const sourceTemplatePath = `${rootDir}/index.html`;
+const distDir = `${rootDir}/dist`;
+const distPublicDir = `${distDir}/public`;
+const distTemplatePath = `${distDir}/index.html`;
 
-const rootDir = join(import.meta.dir, "..");
-const sourceDir = join(rootDir, "public");
-const sourceTemplatePath = join(rootDir, "index.html");
-const distDir = join(rootDir, "dist");
-const distPublicDir = join(distDir, "public");
-const distTemplatePath = join(distDir, "index.html");
+await Bun.$`mkdir -p ${distDir}`.quiet();
+await Bun.$`mkdir -p ${distPublicDir}`.quiet();
 
-await mkdir(distDir, { recursive: true });
-await rm(distPublicDir, { recursive: true, force: true });
-await cp(sourceDir, distPublicDir, { recursive: true });
-await copyFile(sourceTemplatePath, distTemplatePath);
+for (const fileName of new Bun.Glob("*").scanSync(distPublicDir)) {
+  await Bun.$`rm -f ${`${distPublicDir}/${fileName}`}`.quiet();
+}
+
+for (const fileName of new Bun.Glob("*").scanSync(sourceDir)) {
+  await Bun.write(`${distPublicDir}/${fileName}`, Bun.file(`${sourceDir}/${fileName}`));
+}
+
+await Bun.write(distTemplatePath, Bun.file(sourceTemplatePath));
 
 console.log("Copied public -> dist/public");
 console.log("Copied index.html -> dist/index.html");
