@@ -1,6 +1,7 @@
 const rootDir = Bun.fileURLToPath(new URL("../", import.meta.url));
 const sourceDir = `${rootDir}/public`;
-const sourceTemplatePath = `${rootDir}/index.html`;
+const sourceTemplatePath = `${rootDir}/templates/index.html`;
+const fallbackTemplatePath = `${rootDir}/index.html`;
 const distDir = `${rootDir}/dist`;
 const distPublicDir = `${distDir}/public`;
 const distTemplatePath = `${distDir}/index.html`;
@@ -13,10 +14,14 @@ for (const fileName of new Bun.Glob("*").scanSync(distPublicDir)) {
 }
 
 for (const fileName of new Bun.Glob("*").scanSync(sourceDir)) {
-  await Bun.write(`${distPublicDir}/${fileName}`, Bun.file(`${sourceDir}/${fileName}`));
+  const content = await Bun.file(`${sourceDir}/${fileName}`).arrayBuffer();
+  await Bun.write(`${distPublicDir}/${fileName}`, content);
 }
 
-await Bun.write(distTemplatePath, Bun.file(sourceTemplatePath));
+const templatePath = (await Bun.file(sourceTemplatePath).exists())
+  ? sourceTemplatePath
+  : fallbackTemplatePath;
+await Bun.write(distTemplatePath, await Bun.file(templatePath).text());
 
 console.log("Copied public -> dist/public");
 console.log("Copied index.html -> dist/index.html");
