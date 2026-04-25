@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "css-normalize": "0.0.1",
+    "mustache-bun": "^4.2.2",
     "skeleton.css": "^2.0.4"
   }
 }
