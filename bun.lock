@@ -7,6 +7,7 @@
       "dependencies": {
         "css-normalize": "0.0.1",
         "mustache-bun": "^4.2.2",
+        "simple-statistics": "^7.8.9",
         "skeleton.css": "^2.0.4",
       },
       "devDependencies": {
@@ -69,6 +70,8 @@
     "readdirp": ["readdirp@4.1.2", "", {}, "sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg=="],
 
     "sass": ["sass@1.97.3", "", { "dependencies": { "chokidar": "^4.0.0", "immutable": "^5.0.2", "source-map-js": ">=0.6.2 <2.0.0" }, "optionalDependencies": { "@parcel/watcher": "^2.4.1" }, "bin": { "sass": "sass.js" } }, "sha512-fDz1zJpd5GycprAbu4Q2PV/RprsRtKC/0z82z0JLgdytmcq0+ujJbJ/09bPGDxCLkKY3Np5cRAOcWiVkLXJURg=="],
+
+    "simple-statistics": ["simple-statistics@7.8.9", "", {}, "sha512-YT6MLqYsz7y1rQZOLFlOCCgSRpCi6bqY417yhoOLI7aVoBi29dD39EPrOE03W9DY25H0J0jizVsHZnkLzyGJFg=="],
 
     "skeleton.css": ["skeleton.css@2.0.4", "", {}, "sha512-RBp7qFw/U+wJR+l3FuPqVGwlk2iG02ypr06nLF/gM5/BFFEnyjM1InLqLhi13nFvSeTZLblURcQafEcx/kHFQA=="],
 

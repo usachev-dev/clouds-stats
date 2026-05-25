@@ -1,4 +1,4 @@
-import { getPublicFiles, publicDirFsPath, renderHomepage, renderHtml } from "./src/render";
+import { publicDirFsPath, renderHomepage } from "./src/render";
 import { join } from "node:path";
 
 function resolvePublicFile(requestedPath: string): string | null {
@@ -46,8 +46,6 @@ function respondHTML(content: Promise<string>): Promise<Response> {
       "Content-Type": "text; charset=utf-8",
     }, }))
 } 
-
-
 
 
 console.log(`Server running at http://localhost:${server.port}`);
